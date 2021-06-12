@@ -12,6 +12,9 @@ public class BallLauncher : MonoBehaviour
 
     Camera cam;
 
+    [SerializeReference]
+    private TimeSlowManager timeSlowManager;
+
     private void Awake()
     {
         cam = Camera.main;
@@ -26,14 +29,14 @@ public class BallLauncher : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            TimeSlowManager.instance.SlowTime(0.2f);
+            timeSlowManager.SlowTime(0.2f);
             targetingReticule.SetActive(true);
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             FireBall(direction * firePower);
-            TimeSlowManager.instance.ResetSlow();
+            timeSlowManager.ResetSlow();
             targetingReticule.SetActive(false);
         }
 

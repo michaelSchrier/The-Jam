@@ -6,19 +6,8 @@ public class TimeSlowManager : MonoBehaviour
 {
     private float fixedTimeStep;
 
-    public static TimeSlowManager instance;
-
     void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         Time.fixedDeltaTime = 1 / 60f;
         fixedTimeStep = Time.fixedDeltaTime;
     }
