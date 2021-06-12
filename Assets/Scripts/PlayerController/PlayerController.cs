@@ -252,17 +252,20 @@ public class PlayerController : SerializedMonoBehaviour
 
         stateMachine.AddTransition(inAirState, walkingState, () => parameters.isGrounded);
 
-        bool HitSideAndFalling()
+
+        bool HitSide()
         {
-            return (parameters.hitRight || parameters.hitLeft) && rb2d.velocity.y < 0;
+            return (parameters.hitRight || parameters.hitLeft);
         }
 
 
-        stateMachine.AddTransition(inAirState, wallClingState, HitSideAndFalling);
-        stateMachine.AddTransition(wallClingState, inAirState, () => !HitSideAndFalling());
+        stateMachine.AddTransition(inAirState, wallClingState, () => HitSide() && rb2d.velocity.y < 0);
+        stateMachine.AddTransition(wallClingState, inAirState, () => !HitSide());
         stateMachine.AddTransition(wallClingState, standingState, () => parameters.isGrounded);
 
         stateMachine.AddTransition(wallClingState, wallJumpState, () => didJumpThisFrame);
-        stateMachine.AddTransition(wallJumpState, inAirState, () => rb2d.velocity.y <= 0);
+        stateMachine.AddTransition(wallJumpState, inAirState, () => rb2d.velocity.y <= 0 || stateMachine.TimeSinceStateChange > 0.2f);
+
+        stateMachine.AddTransition(inAirState, wallJumpState, () => HitSide() && didJumpThisFrame);
     }
 }
