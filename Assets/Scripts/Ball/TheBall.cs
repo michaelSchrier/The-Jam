@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using PubSub;
+using System;
 
 public class TheBall : SerializedMonoBehaviour
 {
@@ -18,6 +20,17 @@ public class TheBall : SerializedMonoBehaviour
     {
         rb2d = GetComponent<Rigidbody2D>();
         cc2d = GetComponent<CircleCollider2D>();
+        Hub.Default.Subscribe<PlayerDeathMessage>(this, KillPlayer);
+    }
+
+    private void OnDestroy()
+    {
+        Hub.Default.Unsubscribe<PlayerDeathMessage>(this, KillPlayer);
+    }
+
+    private void KillPlayer(PlayerDeathMessage obj)
+    {
+        Destroy(gameObject);
     }
 
     private void Update()

@@ -3,13 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using PubSub;
 
 public class PlayerController : SerializedMonoBehaviour
 {
-    public float groundCheckLength = 0.02f;
+    public float horizontalCheckLength = 0.02f;
+    public float verticalCheckLength = 0.04f;
     public float skinWidth = 0.02f;
-    public int numOfGroundChecks = 2;
+    public int numOfChecks = 2;
+    public float playerSpeed = 7.5f;
+    bool didJumpThisFrame = false;
     public PlayerParameters parameters;
+    public static PlayerController intance;
     [ShowInInspector] StateMachine stateMachine = new StateMachine();
 
     [TabGroup("Standing")] [InlineEditor] 
@@ -27,11 +32,23 @@ public class PlayerController : SerializedMonoBehaviour
     [TabGroup("Throwing")] [InlineEditor] 
     public ThrowingState throwingState;
 
+    [TabGroup("WallCling")]
+    [InlineEditor]
+    public WallClingState wallClingState;
+
+    [TabGroup("WallJump")]
+    [InlineEditor]
+    public WallJumpState wallJumpState;
+
+    public GameObject deathParticles;
+
     Rigidbody2D rb2d;
     BoxCollider2D bc2d;
 
     private void Awake()
     {
+        intance = this;
+        Hub.Default.Subscribe<PlayerDeathMessage>(this, KillPlayer);
         rb2d = GetComponent<Rigidbody2D>();
         bc2d = GetComponent<BoxCollider2D>();
         parameters.isLookingRight = true;
@@ -41,9 +58,34 @@ public class PlayerController : SerializedMonoBehaviour
         stateMachine.ChangeState(standingState);
     }
 
+    private void Start()
+    {
+        Hub.Default.Publish(new SetCameraFocusMessage(transform));
+    }
+
+    private void OnDestroy()
+    {
+        Hub.Default.Unsubscribe<PlayerDeathMessage>(this, KillPlayer);
+    }
+
+
+
+    public void KillPlayer(PlayerDeathMessage death)
+    {
+        gameObject.SetActive(false);
+        if (deathParticles)
+            Instantiate(deathParticles, transform.position, Quaternion.identity);
+        
+    }
+
     void Update()
     {
         parameters.playerInput = CaptureInput();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            didJumpThisFrame = true;
+        }
     }
 
     private void FixedUpdate()
@@ -52,26 +94,37 @@ public class PlayerController : SerializedMonoBehaviour
         SensoryUpdate();
         parameters.velocityThisFrame = Vector2.zero;
         UpdateGravity();
+        UpdateHorizontalForce();
 
         stateMachine.Tick(Time.deltaTime);
 
         rb2d.velocity = CalculateFinalVelocity();
+
+        didJumpThisFrame = false;
     }
 
     Vector2 CalculateFinalVelocity()
     {
         parameters.velocityThisFrame.y += parameters.gravity;
 
-        var angle = Vector2.SignedAngle(parameters.groundNormal, Vector2.up);
-        var final = Quaternion.Euler(0, 0, -angle) * parameters.playerInput * 6f;
-        Debug.DrawRay(bc2d.bounds.center, parameters.groundNormal * 2, Color.blue);
-        Debug.DrawRay(bc2d.bounds.center, final.normalized * 2, Color.blue);
+        var currentPlayer = parameters.playerInput.x * playerSpeed * (1 - (parameters.currentHorizontalForce / parameters.lastHorizontalForce));
+
+        var final = new Vector2(currentPlayer + parameters.currentHorizontalForce, 0);
+
         parameters.velocityThisFrame += (Vector2)final;
         return parameters.velocityThisFrame;
     }
 
+    void UpdateHorizontalForce()
+    {
+        parameters.currentHorizontalForce = Mathf.MoveTowards(parameters.currentHorizontalForce, 0, parameters.horizontalForceReducer * Time.deltaTime);
+    }
+
     void LookUpdate()
     {
+        if (parameters.flipLocked)
+            return;
+
         if(parameters.playerInput.x > 0)
         {
             parameters.isLookingRight = true;
@@ -89,8 +142,12 @@ public class PlayerController : SerializedMonoBehaviour
         inAirState = Instantiate(inAirState);
         jumpingState = Instantiate(jumpingState);
         throwingState = Instantiate(throwingState);
+        wallClingState = Instantiate(wallClingState);
+        wallJumpState = Instantiate(wallJumpState);
 
         jumpingState.Initialize(parameters);
+        wallClingState.Initialize(parameters);
+        wallJumpState.Initialize(parameters);
     }
 
     Vector2 CaptureInput()
@@ -101,6 +158,7 @@ public class PlayerController : SerializedMonoBehaviour
     void UpdateGravity()
     {
         parameters.gravity += Physics2D.gravity.y * parameters.gravityMultiplier * Time.deltaTime;
+        parameters.gravity = Mathf.Clamp(parameters.gravity, parameters.terminalVelocity, int.MaxValue);
 
         if ((parameters.isGrounded && rb2d.velocity.y < 0.01f) || (parameters.hitTop && rb2d.velocity.y > -0.01f))
             parameters.gravity = 0;
@@ -110,20 +168,25 @@ public class PlayerController : SerializedMonoBehaviour
     {
         parameters.isGrounded = false;
         parameters.hitTop = false;
+        parameters.hitLeft = false;
+        parameters.hitRight = false;
         parameters.groundNormal = Vector2.up;
 
         var leftOfBox = bc2d.bounds.center.x - bc2d.size.x / 2;
+        var rightOfBox = bc2d.bounds.center.x + bc2d.size.x / 2;
         var bottomOfBox = bc2d.bounds.center.y - bc2d.bounds.size.y / 2;
         var topOfBox = bc2d.bounds.center.y + bc2d.bounds.size.y / 2;
-        var xSegmentLength = bc2d.bounds.size.x / (numOfGroundChecks - 1);
-        var length = groundCheckLength + skinWidth;
+        var xSegmentLength = bc2d.bounds.size.x / (numOfChecks - 1);
+        var ySegmentLength = bc2d.bounds.size.y / (numOfChecks - 1);
+        var horizontalLength = horizontalCheckLength + skinWidth;
+        var verticalLength = verticalCheckLength + skinWidth;
 
-        for (int i = 0; i < numOfGroundChecks; i++)
+        for (int i = 0; i < numOfChecks; i++)
         {
             var origin = new Vector2(leftOfBox + xSegmentLength * i, bottomOfBox + skinWidth);
             var direction = Vector2.down;
-            var hitData = Physics2D.Raycast(origin, direction, length, LayerMask.GetMask("Ground"));
-            Debug.DrawRay(origin, direction * length, Color.red);
+            var hitData = Physics2D.Raycast(origin, direction, verticalLength, LayerMask.GetMask("Ground"));
+            Debug.DrawRay(origin, direction * verticalLength, Color.red);
 
             if (hitData)
             {
@@ -132,16 +195,42 @@ public class PlayerController : SerializedMonoBehaviour
             }      
         }
 
-        for (int i = 0; i < numOfGroundChecks; i++)
+        for (int i = 0; i < numOfChecks; i++)
         {
             var origin = new Vector2(leftOfBox + xSegmentLength * i, topOfBox - skinWidth);
             var direction = Vector2.up;
-            var hitData = Physics2D.Raycast(origin, direction, length, LayerMask.GetMask("Ground"));
-            Debug.DrawRay(origin, direction * length, Color.red);
+            var hitData = Physics2D.Raycast(origin, direction, verticalLength, LayerMask.GetMask("Ground"));
+            Debug.DrawRay(origin, direction * verticalLength, Color.red);
 
             if (hitData)
             {
                 parameters.hitTop = true;
+            }
+        }
+
+        for (int i = 0; i < numOfChecks; i++)
+        {
+            var origin = new Vector2(leftOfBox + skinWidth, bottomOfBox + ySegmentLength * i);
+            var direction = Vector2.left;
+            var hitData = Physics2D.Raycast(origin, direction, horizontalLength, LayerMask.GetMask("Ground"));
+            Debug.DrawRay(origin, direction * horizontalLength, Color.red);
+
+            if (hitData)
+            {
+                parameters.hitLeft = true;
+            }
+        }
+
+        for (int i = 0; i < numOfChecks; i++)
+        {
+            var origin = new Vector2(rightOfBox - skinWidth, bottomOfBox + ySegmentLength * i);
+            var direction = Vector2.right;
+            var hitData = Physics2D.Raycast(origin, direction, horizontalLength, LayerMask.GetMask("Ground"));
+            Debug.DrawRay(origin, direction * horizontalLength, Color.red);
+
+            if (hitData)
+            {
+                parameters.hitRight = true;
             }
         }
     }
@@ -153,11 +242,27 @@ public class PlayerController : SerializedMonoBehaviour
         stateMachine.AddTransition(standingState, walkingState, () => parameters.playerInput.x != 0);
         stateMachine.AddTransition(walkingState, standingState, () => parameters.playerInput.x == 0);
 
-        stateMachine.AddTransition(standingState, jumpingState, () => parameters.isGrounded && Input.GetKey(KeyCode.Space));
-        stateMachine.AddTransition(walkingState, jumpingState, () => parameters.isGrounded && Input.GetKey(KeyCode.Space));
+        stateMachine.AddTransition(standingState, inAirState, () => !parameters.isGrounded);
+        stateMachine.AddTransition(walkingState, inAirState, () => !parameters.isGrounded);
+
+        stateMachine.AddTransition(standingState, jumpingState, () => parameters.isGrounded && didJumpThisFrame);
+        stateMachine.AddTransition(walkingState, jumpingState, () => parameters.isGrounded && didJumpThisFrame);
         stateMachine.AddTransition(jumpingState, inAirState, () => rb2d.velocity.y <= 0);
         stateMachine.AddTransition(jumpingState, inAirState, () => !Input.GetKey(KeyCode.Space) && stateMachine.TimeSinceStateChange > 0.05f, ()=> parameters.gravity = rb2d.velocity.y * 0.2f);
 
         stateMachine.AddTransition(inAirState, walkingState, () => parameters.isGrounded);
+
+        bool HitSideAndFalling()
+        {
+            return (parameters.hitRight || parameters.hitLeft) && rb2d.velocity.y < 0;
+        }
+
+
+        stateMachine.AddTransition(inAirState, wallClingState, HitSideAndFalling);
+        stateMachine.AddTransition(wallClingState, inAirState, () => !HitSideAndFalling());
+        stateMachine.AddTransition(wallClingState, standingState, () => parameters.isGrounded);
+
+        stateMachine.AddTransition(wallClingState, wallJumpState, () => didJumpThisFrame);
+        stateMachine.AddTransition(wallJumpState, inAirState, () => rb2d.velocity.y <= 0);
     }
 }

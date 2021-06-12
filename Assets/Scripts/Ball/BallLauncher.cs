@@ -1,3 +1,4 @@
+using PubSub;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ public class BallLauncher : MonoBehaviour
 {
     public GameObject targetingReticule;
     public float firePower = 10;
+    public float timeSlowIntensity = 0.2f;
 
     public GameObject ballPrefab;
     private GameObject spawnedBall;
@@ -26,14 +28,14 @@ public class BallLauncher : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            TimeSlowManager.instance.SlowTime(0.2f);
+            Hub.Default.Publish(new TimeSlowMessage(timeSlowIntensity));
             targetingReticule.SetActive(true);
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             FireBall(direction * firePower);
-            TimeSlowManager.instance.ResetSlow();
+            Hub.Default.Publish(new ResetTimeSlowMessage());
             targetingReticule.SetActive(false);
         }
 
