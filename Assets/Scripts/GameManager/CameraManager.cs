@@ -32,7 +32,6 @@ public class CameraManager : MonoBehaviour
 
     void SetCameraFocusHandler(SetCameraFocusMessage message)
     {
-        Debug.Log("Cam Set");
         cam.Follow = message.Target;
     }
 
