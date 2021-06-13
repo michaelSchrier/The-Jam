@@ -270,7 +270,7 @@ public class PlayerController : SerializedMonoBehaviour
 
         stateMachine.AddTransition(inAirState, wallJumpState, () => HitSide() && didJumpThisFrame);
 
-        stateMachine.AddAnyTransition(throwingState, () => didLeftClickThisFrame);
-        stateMachine.AddTransition(throwingState, standingState, () => !Input.GetMouseButton(0));
+        stateMachine.AddAnyTransition(throwingState, () => didLeftClickThisFrame && throwingState.CanThrow);
+        stateMachine.AddTransition(throwingState, standingState, () => !Input.GetMouseButton(0) || stateMachine.TimeSinceStateChange > 0.3f);//So short because time slow.
     }
 }

@@ -18,6 +18,8 @@ public class ThrowingState : SerializedScriptableObject, IState
     private GameObject spawnedBall;
     public Vector2 direction;
 
+    public bool CanThrow => spawnedBall == null;
+
     public void Initialize(PlayerController controller)
     {
         this.controller = controller;
