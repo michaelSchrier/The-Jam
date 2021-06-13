@@ -10,6 +10,12 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private GameObject CreditsView;
 
+    private void Start()
+    {
+        var audioSet = GetComponent<AudioSetter>();
+        audioSet.ChangeAudio();
+    }
+
     public void StartGame()
     {
         SceneManager.LoadScene(StartScene.name);
