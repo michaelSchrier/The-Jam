@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using Sirenix.OdinInspector;
+using System;
 
 public class CameraManager : MonoBehaviour
 {
     CinemachineVirtualCamera cam;
     CinemachineBasicMultiChannelPerlin perlin;
+    public CinemachineConfiner confiner;
     float currentAmp;
     float currentFreq;
     float shakeDuration;
@@ -19,15 +21,28 @@ public class CameraManager : MonoBehaviour
     {
         cam = GetComponent<CinemachineVirtualCamera>();
         perlin = cam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+        confiner = GetComponent<CinemachineConfiner>();
 
         Hub.Default.Subscribe<CameraShakeMessage>(this, CameraShakeMessageHandler);
         Hub.Default.Subscribe<SetCameraFocusMessage>(this, SetCameraFocusHandler);
+        Hub.Default.Subscribe<SetConfinerMessage>(this, SetConfinerHandler);
+    }
+
+    private void SetConfinerHandler(SetConfinerMessage obj)
+    {
+        if(confiner == null)
+        {
+            Debug.Log("Wtf");
+        }
+        confiner.m_BoundingShape2D = obj.Collider;
+        confiner.InvalidatePathCache();
     }
 
     private void OnDestroy()
     {
         Hub.Default.Unsubscribe<CameraShakeMessage>(this, CameraShakeMessageHandler);
         Hub.Default.Unsubscribe<SetCameraFocusMessage>(this, SetCameraFocusHandler);
+        Hub.Default.Unsubscribe<SetConfinerMessage>(this, SetConfinerHandler);
     }
 
     void SetCameraFocusHandler(SetCameraFocusMessage message)
@@ -90,5 +105,15 @@ public class SetCameraFocusMessage
     public SetCameraFocusMessage(Transform target)
     {
         Target = target;
+    }
+}
+
+public class SetConfinerMessage
+{
+    public PolygonCollider2D Collider { get; }
+
+    public SetConfinerMessage(PolygonCollider2D collider)
+    {
+        Collider = collider;
     }
 }
