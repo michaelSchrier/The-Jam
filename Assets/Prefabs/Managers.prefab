@@ -404,6 +404,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6246921940403811852}
+  - component: {fileID: 174262102838590391}
   - component: {fileID: 5938377405125562360}
   m_Layer: 0
   m_Name: AudioManager
@@ -426,6 +427,21 @@ Transform:
   m_Father: {fileID: 1684091028693499343}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &174262102838590391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4752597969401896219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b499f337d030d9a4583cc9c7c4dc992b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titleTheme: {fileID: 8300000, guid: ced65efe25eb1fc4e888c772f6ce80a2, type: 3}
+  chaseTheme: {fileID: 8300000, guid: 28d152c5a8133d948b6d4f932570154a, type: 3}
+  source: {fileID: 5938377405125562360}
 --- !u!82 &5938377405125562360
 AudioSource:
   m_ObjectHideFlags: 0
@@ -436,11 +452,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 28d152c5a8133d948b6d4f932570154a, type: 3}
+  m_audioClip: {fileID: 8300000, guid: ced65efe25eb1fc4e888c772f6ce80a2, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -580,7 +596,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &2862792243785221311
 MonoBehaviour:
