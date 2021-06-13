@@ -268,7 +268,7 @@ MonoBehaviour:
     gravityMultiplier: 1
     lastHorizontalForce: 1
     currentHorizontalForce: 0
-    horizontalForceReducer: 14.5
+    horizontalForceReducer: 12
     terminalVelocity: -20
     isGrounded: 0
     hitTop: 0

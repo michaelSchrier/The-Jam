@@ -16,6 +16,14 @@ public class LevelResetManager : MonoBehaviour
         Hub.Default.Unsubscribe<PlayerDeathMessage>(this, ResetLevelHandler);
     }
 
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.R))
+        {
+            ResetLevelHandler(new PlayerDeathMessage());
+        }
+    }
+
     void ResetLevelHandler(PlayerDeathMessage message)
     {
         StartCoroutine(ResetLevel());

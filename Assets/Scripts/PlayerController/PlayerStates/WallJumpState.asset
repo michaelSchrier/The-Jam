@@ -22,4 +22,4 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   jumpHeight: 3
-  pushFactor: 10
+  pushFactor: 8
