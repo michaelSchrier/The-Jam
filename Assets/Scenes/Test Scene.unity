@@ -6084,6 +6084,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneTransitioner
       objectReference: {fileID: 0}
+    - target: {fileID: 7394958003098310619, guid: fbbb2b8cbd2447a4b9d9bb7e666110ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fbbb2b8cbd2447a4b9d9bb7e666110ed, type: 3}
 --- !u!1001 &8592083797178174672
