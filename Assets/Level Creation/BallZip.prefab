@@ -158,7 +158,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zipSpeed: 20
   zipPlayer: 0
-  placeHolder: {fileID: 6137841185034498082, guid: c969676b499e46a4f8fa55d8eb1fcce5, type: 3}
+  placeHolder: {fileID: 1181999208681108289, guid: 9c52884853dc27a4db05f56ccd0f0f46, type: 3}
 --- !u!58 &1006158601542410239
 CircleCollider2D:
   m_ObjectHideFlags: 0

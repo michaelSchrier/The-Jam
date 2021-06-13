@@ -88,7 +88,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2095442271520395501
 Transform:
   m_ObjectHideFlags: 0
@@ -164,6 +164,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3050623588974972118}
   - component: {fileID: 128507797642163750}
+  - component: {fileID: 4879511898260903885}
   m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
@@ -200,6 +201,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 7367744643199419170}
+--- !u!114 &4879511898260903885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3754446335357496554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 365747f7b69c5774c810ee34b62c69b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 7367744643199419170}
+  playerAnimator: {fileID: 4033023224119283619}
 --- !u!1 &7367744643199419171
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,6 +292,12 @@ MonoBehaviour:
     isLookingRight: 0
     flipLocked: 0
     groundNormal: {x: 0, y: 0}
+  stateMachine:
+    framesSinceStateChange: 0
+    timeSinceStateChange: 0
+    pauseMachine: 0
+    redoCurrentState: 0
+    debugState: 
   standingState: {fileID: 11400000, guid: dc8b147d9c24c1f4f922bd7bf6996e07, type: 2}
   walkingState: {fileID: 11400000, guid: 51a81b65249ede141b7cd6afa77ebdcb, type: 2}
   inAirState: {fileID: 11400000, guid: a0d9d67e57c63994fa061bdbc972d771, type: 2}
@@ -404,7 +425,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: d090db82fad11314285245d56c6f0d18, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a43a93996460d0447a5b30e89490c7ca, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

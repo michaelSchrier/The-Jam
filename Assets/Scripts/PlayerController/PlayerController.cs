@@ -16,7 +16,7 @@ public class PlayerController : SerializedMonoBehaviour
     bool didLeftClickThisFrame = false;
     public PlayerParameters parameters;
     public static PlayerController intance;
-    [ShowInInspector] StateMachine stateMachine = new StateMachine();
+    public StateMachine stateMachine = new StateMachine();
 
     [TabGroup("Standing")] [InlineEditor] 
     public StandingState standingState;
