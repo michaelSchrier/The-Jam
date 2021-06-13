@@ -9,6 +9,10 @@ public class SceneTransitioner : MonoBehaviour
 
     public void ChangeScene()
     {
-        Hub.Default.Publish(new ChangeSceneMessage(sceneToChange));       
+        Hub.Default.Publish(new ChangeSceneMessage(sceneToChange)); 
+        if(PlayerController.intance != null)
+        {
+            PlayerController.intance.gameObject.SetActive(false);
+        }
     }
 }
