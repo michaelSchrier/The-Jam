@@ -5780,7 +5780,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1006158601542410238, guid: e3664a9ee40abb247b493a212aa9d600, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5638152631445909438, guid: e3664a9ee40abb247b493a212aa9d600, type: 3}
+      propertyPath: rotateSpeed
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3664a9ee40abb247b493a212aa9d600, type: 3}
@@ -6079,6 +6083,10 @@ PrefabInstance:
     - target: {fileID: 7394958003098310619, guid: fbbb2b8cbd2447a4b9d9bb7e666110ed, type: 3}
       propertyPath: m_Name
       value: SceneTransitioner
+      objectReference: {fileID: 0}
+    - target: {fileID: 7394958003098310619, guid: fbbb2b8cbd2447a4b9d9bb7e666110ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fbbb2b8cbd2447a4b9d9bb7e666110ed, type: 3}

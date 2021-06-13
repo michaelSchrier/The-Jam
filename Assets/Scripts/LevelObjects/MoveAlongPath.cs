@@ -7,10 +7,15 @@ public class MoveAlongPath : MonoBehaviour
 {
     public PathCreator pathCreator;
     public float travelSpeed;
+    public bool fired;
 
     public void MoveZip()
     {
-        StartCoroutine(Move());
+        if (!fired)
+        {
+            StartCoroutine(Move());
+            fired = true;
+        }
     }
 
     IEnumerator Move()
