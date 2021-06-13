@@ -30,10 +30,6 @@ public class CameraManager : MonoBehaviour
 
     private void SetConfinerHandler(SetConfinerMessage obj)
     {
-        if(confiner == null)
-        {
-            Debug.Log("Wtf");
-        }
         confiner.m_BoundingShape2D = obj.Collider;
         confiner.InvalidatePathCache();
     }
