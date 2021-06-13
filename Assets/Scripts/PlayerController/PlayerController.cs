@@ -13,6 +13,7 @@ public class PlayerController : SerializedMonoBehaviour
     public int numOfChecks = 2;
     public float playerSpeed = 7.5f;
     bool didJumpThisFrame = false;
+    bool didLeftClickThisFrame = false;
     public PlayerParameters parameters;
     public static PlayerController intance;
     [ShowInInspector] StateMachine stateMachine = new StateMachine();
@@ -74,18 +75,17 @@ public class PlayerController : SerializedMonoBehaviour
     {
         gameObject.SetActive(false);
         if (deathParticles)
-            Instantiate(deathParticles, transform.position, Quaternion.identity);
-        
+            Instantiate(deathParticles, transform.position, Quaternion.identity);    
     }
 
     void Update()
     {
-        parameters.playerInput = CaptureInput();
+        parameters.playerInput = CaptureMovementInput();
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             didJumpThisFrame = true;
-        }
+        if (Input.GetMouseButtonDown(0))
+            didLeftClickThisFrame = true;
     }
 
     private void FixedUpdate()
@@ -101,6 +101,7 @@ public class PlayerController : SerializedMonoBehaviour
         rb2d.velocity = CalculateFinalVelocity();
 
         didJumpThisFrame = false;
+        didLeftClickThisFrame = false;
     }
 
     Vector2 CalculateFinalVelocity()
@@ -148,9 +149,10 @@ public class PlayerController : SerializedMonoBehaviour
         jumpingState.Initialize(parameters);
         wallClingState.Initialize(parameters);
         wallJumpState.Initialize(parameters);
+        throwingState.Initialize(this);
     }
 
-    Vector2 CaptureInput()
+    Vector2 CaptureMovementInput()
     {
         return new Vector2(Input.GetAxis("Horizontal"), 0);
     }
@@ -267,5 +269,8 @@ public class PlayerController : SerializedMonoBehaviour
         stateMachine.AddTransition(wallJumpState, inAirState, () => rb2d.velocity.y <= 0 || stateMachine.TimeSinceStateChange > 0.2f);
 
         stateMachine.AddTransition(inAirState, wallJumpState, () => HitSide() && didJumpThisFrame);
+
+        stateMachine.AddAnyTransition(throwingState, () => didLeftClickThisFrame);
+        stateMachine.AddTransition(throwingState, standingState, () => !Input.GetMouseButton(0));
     }
 }

@@ -21,3 +21,8 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
+  reticulePrefab: {fileID: 5710806516878106861, guid: 7d5cfdc1ac9a70f43901ebc1d6efb08e, type: 3}
+  firePower: 30
+  timeSlowIntensity: 0.2
+  ballPrefab: {fileID: 1607382970689776599, guid: 68a6f756ea9a8b94eb4a2fa70ee9ec58, type: 3}
+  direction: {x: 0, y: 0}
