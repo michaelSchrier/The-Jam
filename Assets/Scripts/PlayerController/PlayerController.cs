@@ -74,6 +74,7 @@ public class PlayerController : SerializedMonoBehaviour
     public void KillPlayer(PlayerDeathMessage death)
     {
         gameObject.SetActive(false);
+        Hub.Default.Publish(new ResetTimeSlowMessage());
         if (deathParticles)
             Instantiate(deathParticles, transform.position, Quaternion.identity);    
     }
