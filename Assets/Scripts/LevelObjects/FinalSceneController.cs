@@ -15,7 +15,8 @@ public class FinalSceneController : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(FinalScene());   
+        StartCoroutine(FinalScene());
+        Hub.Default.Publish(new AudioSetMessage(Music.Title));
     }
 
     IEnumerator FinalScene()

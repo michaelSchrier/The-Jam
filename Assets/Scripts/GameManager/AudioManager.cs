@@ -21,16 +21,16 @@ public class AudioManager : MonoBehaviour
 
     void SetAudio(AudioSetMessage message)
     {
-        if(message.musicTheme == Music.Title)
+        if(message.musicTheme == Music.Title && source.clip != titleTheme)
         {
             source.clip = titleTheme;
+            source.Play();
         }
-        if (message.musicTheme == Music.Chase)
+        if (message.musicTheme == Music.Chase && source.clip != chaseTheme)
         {
             source.clip = chaseTheme;
+            source.Play();
         }
-
-        source.Play();
     }
 }
 
